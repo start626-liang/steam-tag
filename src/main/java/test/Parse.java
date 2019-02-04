@@ -14,12 +14,18 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.logging.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+/**
+ *  加载json文件，在访问HTML文件，在解析录入数据库.
+ */
 public class Parse {
 
   private HikariDataSource ds;
+  private static final Logger log = Logger.getLogger("com.my.app");
 
   /**
    * 初始化连接池.
@@ -44,17 +50,25 @@ public class Parse {
     ds = new HikariDataSource(config);
   }
 
+
+  /**
+   * @return 返回一个数据库连接
+   */
   private Connection getConnection() {
     try {
       return ds.getConnection();
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.severe(e.toString());
       return null;
     }
   }
 
-  public static void main(String[] args) {
-    //读取jaon文件
+
+  /**
+   * 解析json文件.
+   * @return json字符串
+   */
+  private static String loadJson() {
     Path file = null;
     BufferedReader bufferedReader = null;
     String relativelyPath = System.getProperty("user.dir");
@@ -64,80 +78,81 @@ public class Parse {
       file = Paths.get(relativelyPath + "/src/main/resources/a.json");
       InputStream inputStream = Files.newInputStream(file);
 
-      bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+      bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
       String s = null;
-      while ((s = bufferedReader.readLine()) != null){
+      while ((s = bufferedReader.readLine()) != null) {
         ss.append(s);
       }
       json = ss.toString();
     } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        bufferedReader.close();
-      } catch (IOException ioe) {
-        ioe.printStackTrace();
-      }
+      log.severe(e.toString());
     }
-
-    ObjectMapper mapper = new ObjectMapper();
-    ArrayType arrayType = mapper.getTypeFactory().constructArrayType(Games.class);
-    Games[] games = new Games[0];
-
     try {
-      games = mapper.readValue(json, arrayType);
-    } catch (IOException e) {
-      e.printStackTrace();
+      if (bufferedReader != null) {
+        bufferedReader.close();
+      }
+    } catch (IOException ioe) {
+      log.severe(ioe.toString());
     }
+    return json;
+  }
+
+  /**
+   * 初始化数据库连接池.
+   * @param games 游戏库列表
+   */
+  private static void db(Games[] games) {
 
     Parse ds = new Parse();
     ds.init(10, 50);
 
-    //......
-    //最后关闭链接
     try {
       Connection conn = ds.getConnection();
-//      Statement stmt = conn.createStatement();
-//      ResultSet rs = stmt.executeQuery("SELECT * FROM admin");
-//      System.out.println(rs);
-//
-//      //STEP 5: Extract data from result set
-//      while (rs.next()) {
-//        //Retrieve by column name
-//        int id  = rs.getInt("id");
-//        String  user  = rs.getString("user");
-//
-//        //Display values
-//        System.out.println("ID: " + id);
-//        System.out.println(user);
-//      }
-//      rs.close();
-
-
-//    System.out.println(document.select(".app_tag"));
-//    System.out.println("tag:---------------");
-//    for(Element e : document.select("a.app_tag")){
-//      System.out.println(e.text());
-//    }
-//    System.out.println("-------------------");
       //解析HTML文件
       Document document = null;
 
-      for(int i = 0; i < games.length; ++i) {
+      for (int i = 0; i < games.length; ++i) {
         document = Jsoup.connect("https://store.steampowered.com/app/" + games[i].getAppid()).get();
-        PreparedStatement ps = conn.prepareStatement("INSERT INTO app (appid, name) VALUES (?,?)");
+        String s = null;
+        try {
+          s = document.select("div.apphub_AppName").first().text();
+        } catch (NullPointerException e) {
+          log.severe(e.toString() + "，id：" + i);
+        }
+        PreparedStatement ps = conn.prepareStatement("INSERT INTO appa (appid, name) VALUES (?,?)");
 
         ps.setInt(1, games[i].getAppid());
-        ps.setString(2, document.select("div.apphub_AppName").first().text());
+        ps.setString(2, s);
 
-        ps.executeUpdate();
+
+        try {
+          ps.executeUpdate();
+          ps.close();
+        } catch (SQLIntegrityConstraintViolationException e) {
+          log.severe(e.toString());
+        }
       }
-//      stmt.close();
+      //      stmt.close();
+
       conn.close();
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.severe(e.toString());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.severe(e.toString());
     }
+  }
+
+  public static void main(String[] args) {
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayType arrayType = mapper.getTypeFactory().constructArrayType(Games.class);
+    Games[] games = new Games[0];
+
+    String json = loadJson();
+    try {
+      games = mapper.readValue(json, arrayType);
+    } catch (IOException e) {
+      log.severe(e.toString());
+    }
+    db(games);
   }
 }

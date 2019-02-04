@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * 解析html文件
  */
-public class Test {
+public class HTMLTest {
   public static void main(String[] args) throws IOException {
     String favImage = "Not Found";
     try
@@ -46,12 +46,12 @@ public class Test {
         favImage = element.attr("href");
       }
 
-      Document document4 = Jsoup.connect("http://www.yiibai.com").get();
+      Document document4 = Jsoup.connect("https://store.steampowered.com/app/552990").get();
       Elements links = document4.select("a[href]");
       for (Element link : links)
       {
-//        System.out.println("link : " + link.attr("href"));
-//        System.out.println("text : " + link.text());
+        System.out.println("link : " + link.attr("href"));
+        System.out.println("text : " + link.text());
       }
 
       Document document5 = Jsoup.connect("http://www.yiibai.com").get();
