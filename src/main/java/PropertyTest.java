@@ -14,6 +14,7 @@ public class PropertyTest {
     // 创建属性映射
     Properties p = new Properties();
     p.put("appTable" , "app_test");
+    p.put("tagTable" , "tag_test");
     try {
       FileOutputStream out = new FileOutputStream("user.properties");
       p.store(out, "user properties");

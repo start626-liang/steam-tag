@@ -100,8 +100,8 @@ public class AppParse {
   }
 
   /**
-   * 数据库存入数据.
-   * @param games 游戏库列表
+   * 插入数据.
+   * @param games 游戏库列表对象
    */
   private static void db(Games[] games) {
     final AppParse ds = new AppParse();
@@ -142,7 +142,11 @@ public class AppParse {
           + "(appid, name) VALUES (?,?)");
       final int appNum = games.length;
       for (int i = 0; i < appNum; ++i) {
-        document = Jsoup.connect("https://store.steampowered.com/app/" + games[i].getAppid()).get();
+        try {
+          document = Jsoup.connect("https://store.steampowered.com/app/" + games[i].getAppid()).get();
+        } catch (Exception e) {
+          log.warning(e.toString());
+        }
         String s = null;
         try {
           s = document.select("div.apphub_AppName").first().text();
