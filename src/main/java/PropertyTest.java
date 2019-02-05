@@ -9,10 +9,11 @@ import java.util.logging.Logger;
  * 属性映射
  */
 public class PropertyTest {
+  private static final Logger log = Logger.getLogger("com.my.p");
   public static void main(String[] args) {
     // 创建属性映射
     Properties p = new Properties();
-    p.put("pass" , "H171023");
+    p.put("appTable" , "app_test");
     try {
       FileOutputStream out = new FileOutputStream("user.properties");
       p.store(out, "user properties");
@@ -27,9 +28,9 @@ public class PropertyTest {
     try {
       FileInputStream in = new FileInputStream("user.properties");
       try {
-        Logger.getGlobal().info((String) p1.get("w"));
+        Logger.getGlobal().info((String) p1.get("appTable"));
         p1.load(in);
-        Logger.getGlobal().info((String) p1.get("w"));
+        Logger.getGlobal().info((String) p1.get("appTable"));
 
       } catch (IOException e) {
         e.printStackTrace();
