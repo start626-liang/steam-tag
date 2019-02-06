@@ -53,12 +53,12 @@ public class TagTest {
       //关闭自动提交
 //      boolean autoCommit = conn.getAutoCommit();
 //      conn.setAutoCommit(false);
-
+      ps = conn.prepareStatement("INSERT INTO "
+          + table
+          + "(name) VALUES (?)");
       final int appNum = games.length;
       for (int i = 0; i < appNum; ++i) {
-        ps = conn.prepareStatement("INSERT INTO "
-            + table
-            + "(name) VALUES (?)");
+
         try {
           document = Jsoup.connect("https://store.steampowered.com/app/" + games[i].getAppid()).get();
         } catch (Exception e) {

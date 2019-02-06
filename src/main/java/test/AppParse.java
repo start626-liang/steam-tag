@@ -139,7 +139,7 @@ public class AppParse {
 //      conn.setAutoCommit(false);
       ps = conn.prepareStatement("INSERT INTO "
           + appTable
-          + "(appid, name) VALUES (?,?)");
+          + "(id, name) VALUES (?,?)");
       final int appNum = games.length;
       for (int i = 0; i < appNum; ++i) {
         try {

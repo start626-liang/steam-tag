@@ -45,4 +45,36 @@ public class DB {
     }
   }
 
+//  public static void main(String[] args) {
+//    final DB db = new DB();
+//    // 初始化数据库连接池.
+//    db.init(10, 50);
+//    final Connection conn = db.getConnection();
+//    try {
+//      PreparedStatement appTagPs = conn.prepareStatement("INSERT INTO "
+//          + "app_tag_test"
+//          + "(tag, app, ver) VALUES (?, ?, ?)");
+//      PreparedStatement ps = conn.prepareStatement("SELECT id FROM tag_test WHERE name=?");
+//      ps.setString(1, "FPS");
+//      ResultSet rs = ps.executeQuery();
+//      //STEP 5: Extract data from result set
+//      while (rs.next()) {
+//        //Retrieve by column name
+//        if(rs.isLast()){
+//          int id  = rs.getInt("id");
+//          //Display values
+//          System.out.println("ID: " + id);
+//        }
+//      }
+//      appTagPs.setInt(1, 1);
+//      appTagPs.setInt(2, 10);
+//      appTagPs.setString(3, String.valueOf(1) + String.valueOf(10));
+//      appTagPs.executeUpdate();
+//      rs.close();
+//      ps.close();
+//      conn.close();
+//    } catch (SQLException e) {
+//      e.printStackTrace();
+//    }
+//  }
 }

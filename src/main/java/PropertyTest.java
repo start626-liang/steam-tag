@@ -15,7 +15,8 @@ public class PropertyTest {
     Properties p = new Properties();
     p.put("appTable" , "app_test");
     p.put("tagTable" , "tag_test");
-    try {
+    p.put("appTagTable" , "app_tag_test");
+      try {
       FileOutputStream out = new FileOutputStream("user.properties");
       p.store(out, "user properties");
     } catch (FileNotFoundException e) {
