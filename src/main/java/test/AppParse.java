@@ -122,7 +122,6 @@ public class AppParse {
       try {
         p1.load(in);
         appTable = (String) p1.get("appTable");
-
       } catch (IOException e) {
         log.severe(e.toString());
       } finally {
